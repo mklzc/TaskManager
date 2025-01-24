@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    />
+    <style>
+        #script-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .script-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+    
+        .script-item:hover {
+            background-color: #f0f0f0;
+        }
+    
+        .script-item.selected {
+            background-color: #d0f0c0; /* 选中高亮 */
+            font-weight: bold;
+        }
+        #run-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <title>Electron App</title>
+</head>
+<body>
+    <h1>Welcome to Electron</h1>
+    <ul id="script-list"></ul>
+    <button id="run-button">运行</button>
+    <script src="renderer.js"></script>
+</body>
+</html>
