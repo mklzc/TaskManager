@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -9,8 +10,8 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            contextIsolation: true,
+            nodeIntegration: true,
+            contextIsolation: false,
         },
     });
 
@@ -49,7 +50,7 @@ ipcMain.handle('load-scripts', async () => {
 ipcMain.on('run-script', (event, scriptName) => {
     console.log(`Running script: ${scriptName}`);
 
-    exec(`./scripts/${scriptName}`, (error, stdout, stderr) => {
+    exec(`${scriptName}`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error running script: ${error.message}`);
             event.reply('script-result', { success: false, message: error.message });
