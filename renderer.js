@@ -39,12 +39,13 @@ function selectScript(listItem, scriptPath) {
 
 document.getElementById('run-button').addEventListener('click', () => {
     console.log('run-button clicked');
-    // const scriptList = document.getElementById('script-list');
-    // const selectedScript = scriptList.selected;
+    const parameter = document.getElementById("parameter");
     const selectedItem = document.querySelector('#script-list .selected');
 
-    console.log(`selected ${selectedItem.textContent}`);
-    ipcRenderer.send('run-script', selectedItem.textContent);
+    command = `${selectedItem.textContent} ${parameter.value}`
+
+    console.log(`run command ${command}`);
+    ipcRenderer.send('run-script', command);
 });
 
 ipcRenderer.on('script-result', (event, result) => {

@@ -33,10 +33,12 @@ ipcMain.handle('load-scripts', async () => {
     console.log('ipcMain: Received load-scripts request'); // 调试日志
     try {
         const scriptFilePath = path.join(__dirname, 'scripts.txt');
+        // const scriptJsonPath = path.join(__dirname, 'scripts.json');
         if (!fs.existsSync(scriptFilePath)) {
             console.log('scripts.txt not found, creating an empty one.');
             fs.writeFileSync(scriptFilePath, '', 'utf-8');
         }
+
 
         const scripts = fs.readFileSync(scriptFilePath, 'utf-8').split('\n').filter(Boolean);
         console.log('Loaded scripts:', scripts); // 打印加载的脚本
@@ -47,17 +49,16 @@ ipcMain.handle('load-scripts', async () => {
     }
 });
 
-ipcMain.on('run-script', (event, scriptName) => {
-    console.log(`Running script: ${scriptName}`);
+ipcMain.on('run-script', (event, command) => {
+    console.log(`Running script: ${command}`);
 
-    exec(`${scriptName}`, (error, stdout, stderr) => {
+    exec(`${command}`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error running script: ${error.message}`);
             event.reply('script-result', { success: false, message: error.message });
             return;
         }
 
-        // 将运行结果发送回渲染进程
         console.log(`Script output: ${stdout}`);
         event.reply('script-result', { success: true, output: stdout });
     });
