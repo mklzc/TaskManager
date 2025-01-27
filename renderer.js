@@ -55,3 +55,16 @@ ipcRenderer.on('script-result', (event, result) => {
         alert(`Failed to run script: ${result.message}`);
     }
 });
+
+document.getElementById('add-script-button').addEventListener('click', async () => {
+    try {
+        const result = await ipcRenderer.invoke('open-add-script-form');
+        if (result) {
+            console.log('脚本信息:', result);
+        } else {
+            console.log('用户取消了操作。');
+        }
+    } catch (err) {
+        console.error('打开对话框失败:', err);
+    }
+});
