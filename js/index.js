@@ -78,8 +78,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     item.remove();
                 }
             });
-
-
         }
     });
 });
