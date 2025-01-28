@@ -67,8 +67,8 @@ ipcMain.on('run-script', (event, command) => {
 ipcMain.handle('open-add-script-form', async () => {
     // 打开自定义的 HTML 页面作为对话框
     let addScriptWindow = new BrowserWindow({
-        width: 400,
-        height: 300,
+        width: 800,
+        height: 600,
         parent: mainWindow,
         modal: true,
         show: false,  // 初始化不显示，待加载完成后显示

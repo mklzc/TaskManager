@@ -1,0 +1,34 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #f0f4f7, #d9f5f1);
+}
+
+#scriptForm {
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 400px;
+}
+
+#scriptForm label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+#scriptForm button[type="submit"] {
+    background: linear-gradient(45deg, #1e88e5, #43a047);
+}
+
+#cancelButton {
+    background: linear-gradient(45deg, #e53935, #f4511e);
+}

@@ -1,0 +1,49 @@
+#script-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.script-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+.script-item:hover {
+    background-color: #f0f0f0;
+}
+
+.script-item.selected {
+    background-color: #d0f0c0;
+    /* 选中高亮 */
+    font-weight: bold;
+}
+
+#run-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#context-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 5px 0;
+    min-width: 150px;
+}
+
+#context-menu .menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+#context-menu .menu-item:hover {
+    background-color: #f0f0f0;
+}
