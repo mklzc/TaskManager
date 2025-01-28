@@ -1,6 +1,8 @@
 const { ipcRenderer } = require('electron');
 
 let scripts = [];
+const contextMenu = document.getElementById('context-menu');
+let selectedScript = null;
 
 async function refreshScripts() {
     console.log('Refreshing Scripts...');
@@ -14,7 +16,6 @@ function renderScripts() {
 
     console.log('Renderer: Received scripts:', scripts);
 
-    let selectedScript = null;
     // 更新脚本列表
     scriptList.innerHTML = '';
     scripts.forEach((script) => {
@@ -44,7 +45,6 @@ function renderScripts() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Renderer: DOM Content Loaded'); // 确认渲染进程启动
-    const contextMenu = document.getElementById('context-menu');
     await refreshScripts();
 
     ipcRenderer.on('scripts-updated', async () => {
