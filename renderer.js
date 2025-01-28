@@ -1,29 +1,90 @@
 const { ipcRenderer } = require('electron');
 
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Renderer: DOM Content Loaded'); // 确认渲染进程启动
+let scripts = [];
 
+async function refreshScripts() {
+    console.log('Refreshing Scripts...');
+    scripts = await ipcRenderer.invoke('load-scripts');
+    renderScripts();
+}
+
+function renderScripts() {
     const scriptList = document.getElementById('script-list');
     console.log('Renderer: Loading scripts...');
-    const scripts = await ipcRenderer.invoke('load-scripts');
+
     console.log('Renderer: Received scripts:', scripts);
 
+    let selectedScript = null;
     // 更新脚本列表
     scriptList.innerHTML = '';
-    scripts.forEach((scriptPath) => {
+    scripts.forEach((script) => {
         const listItem = document.createElement('li');
-        listItem.textContent = scriptPath;
+        listItem.textContent = script.scriptName;
         listItem.className = 'script-item';
 
         listItem.addEventListener('click', () => {
-            selectScript(listItem, scriptPath);
+            selectScript(listItem, script.scriptName);
         });
+
+        // 绑定右键菜单事件
+        listItem.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            selectedScript = script;
+
+            contextMenu.style.top = `${event.clientY}px`;
+            contextMenu.style.left = `${event.clientX}px`;
+            contextMenu.style.display = 'block';
+            console.log(`右键菜单打开: ${script.scriptName}`);
+        });
+
 
         scriptList.appendChild(listItem);
     });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Renderer: DOM Content Loaded'); // 确认渲染进程启动
+    const contextMenu = document.getElementById('context-menu');
+    await refreshScripts();
+
+    ipcRenderer.on('scripts-updated', async () => {
+        console.log('Scripts updates recieved');
+        await refreshScripts();
+    });
+    
+    document.addEventListener('click', () => {
+        contextMenu.style.display = 'none';
+    });
+
+    const runScriptMenuItem = document.getElementById('run-script');
+    const deleteScriptMenuItem = document.getElementById('delete-script');
+
+    runScriptMenuItem.addEventListener('click', () => {
+        if (selectedScript) {
+            console.log(`运行脚本: ${selectedScript.scriptName}`);
+            command = `${selectedScript.scriptPath} ${selectedScript.scriptParams}`;
+            console.log(`run command ${command}`);
+            ipcRenderer.send('run-script', command);
+        }
+        contextMenu.style.display = 'none';
+    });
+
+    deleteScriptMenuItem.addEventListener('click', () => {
+        if (selectedScript) {
+            console.log(`删除脚本: ${selectedScript.scriptName}`);
+            const items = document.querySelectorAll('.script-item');
+            items.forEach((item) => {
+                if (item.textContent === selectedScript.scriptName) {
+                    item.remove();
+                }
+            });
+
+
+        }
+    });
 });
 
-function selectScript(listItem, scriptPath) {
+function selectScript(listItem, scriptName) {
     // 移除之前选中的样式
     const prevSelected = document.querySelector('.script-item.selected');
     if (prevSelected) {
@@ -32,17 +93,24 @@ function selectScript(listItem, scriptPath) {
 
     // 更新当前选中项
     listItem.classList.add('selected');
-    selectedScript = scriptPath;
+    selectedScript = scriptName;
 
-    console.log('选中脚本:', scriptPath);
+    console.log('选中脚本:', scriptName);
 }
 
 document.getElementById('run-button').addEventListener('click', () => {
     console.log('run-button clicked');
-    const parameter = document.getElementById("parameter");
-    const selectedItem = document.querySelector('#script-list .selected');
 
-    command = `${selectedItem.textContent} ${parameter.value}`
+    const selectedItem = document.querySelector('#script-list .selected');
+    // const scripts = ipcRenderer.invoke('load-scripts');
+    
+    // console.log(scripts)
+    
+    console.log(scripts);
+    const script = scripts.find(s => s.scriptName === selectedItem.textContent);
+    console.log(script)
+
+    command = `${script.scriptPath} ${script.scriptParams}`
 
     console.log(`run command ${command}`);
     ipcRenderer.send('run-script', command);

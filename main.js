@@ -39,11 +39,10 @@ ipcMain.handle('load-scripts', async () => {
             fs.writeFileSync(scriptsJsonPath, '', 'utf-8');
         }
 
-        const fileContent = fs.readFileSync(scriptsJsonPath, 'utf8');
+        const fileContent = fs.readFileSync(scriptsJsonPath, 'utf-8');
         const scripts = JSON.parse(fileContent || '[]');
 
-        const scriptsNameList = scripts.map(script => script.scriptName);
-        return scriptsNameList;
+        return scripts
     } catch (error) {
         console.error('Error loading scripts:', error);
         throw error;
@@ -94,6 +93,7 @@ ipcMain.handle('open-add-script-form', async () => {
     });
 });
 // 保存脚本数据到 JSON 文件
+const scriptsJsonPath = path.join(__dirname, 'scripts.json');
 ipcMain.handle('save-script-data', (event, scriptData) => {
     let scripts = [];
 
@@ -112,6 +112,11 @@ ipcMain.handle('save-script-data', (event, scriptData) => {
     // 写入文件
     fs.writeFileSync(scriptsJsonPath, JSON.stringify(scripts, null, 2), 'utf-8');
     console.log('脚本已保存:', scriptData);
+});
+
+fs.watchFile(scriptsJsonPath, () => {
+    console.log("Scripts.json updated.");
+    mainWindow.webContents.send("scripts-updated");
 });
 
 
