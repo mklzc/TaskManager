@@ -5,6 +5,8 @@
 .tags*
 .vs/
 .vscode/
+logs/
+scripts.json
 *.log
 *.pyc
 *.sln
