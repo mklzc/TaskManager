@@ -13,7 +13,6 @@ async function refreshScripts() {
 function renderScripts() {
     const scriptList = document.getElementById('script-list');
     console.log('Renderer: Loading scripts...');
-
     console.log('Renderer: Received scripts:', scripts);
 
     // 更新脚本列表
@@ -70,14 +69,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     deleteScriptMenuItem.addEventListener('click', () => {
+        console.log(selectedScript);
         if (selectedScript) {
             console.log(`删除脚本: ${selectedScript.scriptName}`);
-            const items = document.querySelectorAll('.script-item');
-            items.forEach((item) => {
-                if (item.textContent === selectedScript.scriptName) {
-                    item.remove();
-                }
-            });
+            ipcRenderer.send('delete-script', selectedScript);
+            refreshScripts();
         }
     });
 });
@@ -127,6 +123,7 @@ document.getElementById('add-script-button').addEventListener('click', async () 
         const result = await ipcRenderer.invoke('open-add-script-form');
         if (result) {
             console.log('脚本信息:', result);
+            refreshScripts();
         } else {
             console.log('用户取消了操作。');
         }

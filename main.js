@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -28,7 +28,7 @@ app.whenReady().then(() => {
     });
 });
 
-// 注册 IPC 通信
+// 加载脚本
 ipcMain.handle('load-scripts', async () => {
     console.log('ipcMain: Received load-scripts request');
     try {
@@ -62,7 +62,7 @@ ipcMain.on('run-script', (event, command) => {
         console.log(`Script output: ${stdout}`);
         event.reply('script-result', { success: true, output: stdout });
     });
-})
+});
 
 ipcMain.handle('open-add-script-form', async () => {
     // 打开自定义的 HTML 页面作为对话框
@@ -92,6 +92,7 @@ ipcMain.handle('open-add-script-form', async () => {
         });
     });
 });
+
 // 保存脚本数据到 JSON 文件
 const scriptsJsonPath = path.join(__dirname, 'scripts.json');
 ipcMain.handle('save-script-data', (event, scriptData) => {
@@ -117,6 +118,30 @@ ipcMain.handle('save-script-data', (event, scriptData) => {
 fs.watchFile(scriptsJsonPath, () => {
     console.log("Scripts.json updated.");
     mainWindow.webContents.send("scripts-updated");
+});
+
+ipcMain.on('delete-script', (event, selectedScript) => {
+    if (!fs.existsSync(scriptsJsonPath)) {
+        return;
+    }
+
+    console.log("recieve OK");
+    let scripts = JSON.parse(fs.readFileSync(scriptsJsonPath, 'utf-8'));
+
+    console.log(scripts);
+
+    const updatedScripts = scripts.filter(script => script.scriptName !== selectedScript.scriptName);
+
+    console.log(updatedScripts);
+
+    if (updatedScripts.length === scripts.length) {
+        // 未找到待删除脚本
+        console.log(`Error find selectedScript ${selectedScript.scriptName}`);
+        return;
+    }
+
+    fs.writeFileSync(scriptsJsonPath, JSON.stringify(updatedScripts, null, 2), 'utf-8');
+    event.reply('script-deleted', selectedScript.scriptName);
 });
 
 
