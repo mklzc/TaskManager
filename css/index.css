@@ -1,27 +1,133 @@
+#container {
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+    height: 70vh;
+}
+
 #script-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.script-item {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #ddd;
-}
-
-.script-item:hover {
-    background-color: #f0f0f0;
+    width: 40%;
+    height: 100%;
+    overflow-y: auto;
+    border-right: 2px solid #ddd;
 }
 
 .script-item.selected {
-    background-color: #d0f0c0;
-    /* 选中高亮 */
+    background: linear-gradient(135deg, #28a745, #218838); /* 绿色渐变 */
+    color: white;
     font-weight: bold;
+    border: none;
+    padding-left: 18px;
+    box-shadow: 0px 4px 10px rgba(40, 167, 69, 0.3); /* 绿色光晕 */
+    position: relative;
 }
 
+.script-item.selected::before {
+    content: "|";
+    font-weight: bold;
+    color: #fff;
+    margin-right: 8px;
+}
+
+.custom-list {
+    margin: 0;
+    list-style: none;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    background: #fff;
+}
+
+.custom-list li {
+    padding: 12px 16px;
+    margin: 6px 8px;
+    border-radius: 8px;
+    background: #f8f9fa; /* 淡灰色背景 */
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+.custom-list li:last-child {
+    border-bottom: none;
+}
+
+.custom-list li:hover {
+    cursor: pointer;
+    transform: scale(1.02);
+}
+
+#script-list, #log-container, .custom-list {
+    box-sizing: border-box;
+    height: 100%;
+}
+
+#log-container {
+    width: 60%;
+    height: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    background: #111; /* 深色背景 */
+    color: #0f0; /* 终端风格的绿色文字 */
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 255, 0, 0.3); /* 绿色光晕 */
+    font-family: "Courier New", monospace; /* 终端风格字体 */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-y: auto;
+    border-left: 2px solid #0f0;
+}
+
+
+/* 添加标题样式 */
+#log-container::before {
+    content: "运行日志";
+    font-size: 16px;
+    font-weight: bold;
+    color: #0f0;
+    padding: 5px;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+/* 终端样式的输出 */
+#log-output {
+    flex-grow: 1;
+    max-height: calc(100% - 30px);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    overflow-y: auto;
+}
+
+/* 自定义滚动条 */
+#log-output::-webkit-scrollbar {
+    width: 4px;
+}
+
+#log-output::-webkit-scrollbar-thumb {
+    background: #0f0;
+    border-radius: 5px;
+}
+
+#log-output::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+
 #run-button {
-    margin-top: 20px;
+    margin-top: 60px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;

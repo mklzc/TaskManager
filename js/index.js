@@ -57,13 +57,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const runScriptMenuItem = document.getElementById('run-script');
     const deleteScriptMenuItem = document.getElementById('delete-script');
+    const viewlogScriptMenuItem = document.getElementById('view-log');
 
     runScriptMenuItem.addEventListener('click', () => {
         if (selectedScript) {
-            console.log(`运行脚本: ${selectedScript.scriptName}`);
-            command = `${selectedScript.scriptPath} ${selectedScript.scriptParams}`;
-            console.log(`run command ${command}`);
-            ipcRenderer.send('run-script', command);
+            console.log(`Runing: ${selectedScript}`);
+            
+            ipcRenderer.send('run-script', selectedScript);
         }
         contextMenu.style.display = 'none';
     });
@@ -96,18 +96,10 @@ document.getElementById('run-button').addEventListener('click', () => {
     console.log('run-button clicked');
 
     const selectedItem = document.querySelector('#script-list .selected');
-    // const scripts = ipcRenderer.invoke('load-scripts');
     
-    // console.log(scripts)
-    
-    console.log(scripts);
-    const script = scripts.find(s => s.scriptName === selectedItem.textContent);
-    console.log(script)
+    const selectedScript = scripts.find(s => s.scriptName === selectedItem.textContent);
 
-    command = `${script.scriptPath} ${script.scriptParams}`
-
-    console.log(`run command ${command}`);
-    ipcRenderer.send('run-script', command);
+    ipcRenderer.send('run-script', selectedScript);
 });
 
 ipcRenderer.on('script-result', (event, result) => {
@@ -130,4 +122,10 @@ document.getElementById('add-script-button').addEventListener('click', async () 
     } catch (err) {
         console.error('打开对话框失败:', err);
     }
+});
+
+ipcRenderer.on('script-output', (event, data) => {
+    const logOutput = document.getElementById('log-output');
+    logOutput.textContent += data + '\n';
+    logOutput.scrollTop = logOutput.scrollHeight; // 滚动到底部
 });

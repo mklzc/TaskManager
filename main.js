@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -33,7 +33,7 @@ ipcMain.handle('load-scripts', async () => {
     console.log('ipcMain: Received load-scripts request');
     try {
         const scriptsJsonPath = path.join(__dirname, 'scripts.json');
-        
+
         if (!fs.existsSync(scriptsJsonPath)) {
             console.log('scripts.json not found, creating an empty one.');
             fs.writeFileSync(scriptsJsonPath, '', 'utf-8');
@@ -49,19 +49,41 @@ ipcMain.handle('load-scripts', async () => {
     }
 });
 
-ipcMain.on('run-script', (event, command) => {
+ipcMain.on('run-script', (event, selectedScript) => {
+    command = `${selectedScript.scriptPath} ${selectedScript.scriptParams}`;
     console.log(`Running script: ${command}`);
+    // const logFilePath = path.join(__dirname, 'logs', `${selectedScript.scriptName}.log`);
 
-    exec(`${command}`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error running script: ${error.message}`);
-            event.reply('script-result', { success: false, message: error.message });
-            return;
-        }
+    if (selectedScript.runMode === "exec") {
+        exec(`${command}`, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error running script: ${error.message}`);
+                event.reply('script-result', { success: false, message: error.message });
+                return;
+            }
 
-        console.log(`Script output: ${stdout}`);
-        event.reply('script-result', { success: true, output: stdout });
-    });
+            // fs.appendFileSync(logFilePath, logContent, 'utf-8');
+            console.log(`Script output: ${stdout}`);
+            event.reply('script-result', { success: true, output: stdout });
+        });
+    }
+    else {
+        const scriptProcess = spawn(selectedScript.scriptPath, [selectedScript.scriptParams], { shell: true });
+        let outputData = '';
+
+        scriptProcess.stdout.on('data', (data) => {
+            event.reply('script-result', data.toString());
+        });
+
+        scriptProcess.stderr.on('data', (data) => {
+            event.reply('script-output', data.toString());
+        });
+
+        scriptProcess.on('close', (code) => {
+            console.log(`进程退出，代码: ${code}`);
+            event.reply('script-output', `脚本退出，代码: ${code}`);
+        });
+    }
 });
 
 ipcMain.handle('open-add-script-form', async () => {
@@ -144,6 +166,14 @@ ipcMain.on('delete-script', (event, selectedScript) => {
     event.reply('script-deleted', selectedScript.scriptName);
 });
 
+ipcMain.on('view-log', (event, scriptName) => {
+    const logFilePath = path.join(__dirname, 'logs', `${scriptName}.log`);
+
+    if (fs.existsSync(logFilePath)) {
+        const logContent = fs.readFileSync(logFilePath, 'utf-8');
+
+    }
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();

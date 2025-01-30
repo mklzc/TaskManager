@@ -10,9 +10,10 @@ form.addEventListener('submit', (event) => {
     const scriptName = document.getElementById('scriptName').value;
     const scriptPath = document.getElementById('scriptPath').value;
     const scriptParams = document.getElementById('scriptParams').value;
+    const runMode = document.querySelector('input[name="run-mode"]:checked').value;
 
     // 发送脚本信息到主进程
-    ipcRenderer.invoke('save-script-data', { scriptName, scriptPath, scriptParams });
+    ipcRenderer.invoke('save-script-data', { scriptName, scriptPath, scriptParams, runMode });
 
     // 关闭窗口
     window.close();

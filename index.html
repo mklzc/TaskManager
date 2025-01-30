@@ -13,12 +13,19 @@
     <title>Electron App</title>
 </head>
 <body>
-    <ul id="script-list"></ul>
+<div id="container">
+    <ul id="script-list" class="custom-list"></ul>
+
+    <div id="log-container">
+        <pre id="log-output"></pre>
+    </div>
+</div>
+</div>
     <div id="context-menu">
         <div class="menu-item" id="run-script">运行脚本</div>
         <div class="menu-item" id="delete-script">删除脚本</div>
+        <div class="menu-item" id="view-log">查看日志</div>
     </div>
-
     <button id="add-script-button" class = "main-btn">添加任务</button>
     <button id="run-button" class = "main-btn">运行</button>
     <script src="js/index.js" class = "main-btn"></script>
