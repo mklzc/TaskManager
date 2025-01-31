@@ -49,39 +49,54 @@ ipcMain.handle('load-scripts', async () => {
     }
 });
 
+const logsDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+}
+
+let runningProcesses = {};
+
 ipcMain.on('run-script', (event, selectedScript) => {
     command = `${selectedScript.scriptPath} ${selectedScript.scriptParams}`;
     console.log(`Running script: ${command}`);
-    // const logFilePath = path.join(__dirname, 'logs', `${selectedScript.scriptName}.log`);
+    const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
+    const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
+    
+    runningProcesses[selectedScript.scriptName] = process;
 
     if (selectedScript.runMode === "exec") {
         exec(`${command}`, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Error running script: ${error.message}`);
-                event.reply('script-result', { success: false, message: error.message });
+                event.reply('script-result', error.message);
                 return;
             }
 
             // fs.appendFileSync(logFilePath, logContent, 'utf-8');
             console.log(`Script output: ${stdout}`);
-            event.reply('script-result', { success: true, output: stdout });
+            event.reply('script-result', stdout);
         });
     }
     else {
         const scriptProcess = spawn(selectedScript.scriptPath, [selectedScript.scriptParams], { shell: true });
-        let outputData = '';
 
         scriptProcess.stdout.on('data', (data) => {
-            event.reply('script-result', data.toString());
+            const logData = `[STDOUT] ${data}`;
+            logStream.write(logData);
+            event.sender.send('update-log', logData);
         });
-
+    
         scriptProcess.stderr.on('data', (data) => {
-            event.reply('script-output', data.toString());
+            const logData = `[STDERR] ${data}`;
+            logStream.write(logData);
+            event.sender.send('update-log', logData);
         });
-
+    
         scriptProcess.on('close', (code) => {
-            console.log(`进程退出，代码: ${code}`);
-            event.reply('script-output', `脚本退出，代码: ${code}`);
+            const logData = `\n[Process Exited] Exit code: ${code}\n`;
+            logStream.write(logData);
+            logStream.end();
+            event.sender.send('update-log', logData);
         });
     }
 });
@@ -172,6 +187,16 @@ ipcMain.on('view-log', (event, scriptName) => {
     if (fs.existsSync(logFilePath)) {
         const logContent = fs.readFileSync(logFilePath, 'utf-8');
 
+    }
+});
+
+ipcMain.on('get-log', (event, scriptName) => {
+    const logFilePath = path.join(logsDir, `${scriptName}.log`);
+    if (fs.existsSync(logFilePath)) {
+        const logContent = fs.readFileSync(logFilePath, 'utf-8');
+        event.reply('load-log', logContent);
+    } else {
+        event.reply('load-log', '[No log available]');
     }
 });
 

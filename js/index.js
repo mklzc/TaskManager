@@ -24,6 +24,7 @@ function renderScripts() {
 
         listItem.addEventListener('click', () => {
             selectScript(listItem, script.scriptName);
+            ipcRenderer.send('get-log', script.scriptName);
         });
 
         // 绑定右键菜单事件
@@ -102,13 +103,6 @@ document.getElementById('run-button').addEventListener('click', () => {
     ipcRenderer.send('run-script', selectedScript);
 });
 
-ipcRenderer.on('script-result', (event, result) => {
-    if (result.success) {
-        alert(`Script ran successfully!\nOutput:\n${result.output}`);
-    } else {
-        alert(`Failed to run script: ${result.message}`);
-    }
-});
 
 document.getElementById('add-script-button').addEventListener('click', async () => {
     try {
@@ -124,8 +118,15 @@ document.getElementById('add-script-button').addEventListener('click', async () 
     }
 });
 
-ipcRenderer.on('script-output', (event, data) => {
-    const logOutput = document.getElementById('log-output');
-    logOutput.textContent += data + '\n';
+const logOutput = document.getElementById('log-output');
+
+ipcRenderer.on('update-log', (event, data) => {
+    logOutput.textContent += `${data}\n`;
     logOutput.scrollTop = logOutput.scrollHeight; // 滚动到底部
 });
+
+ipcRenderer.on('load-log', (event, logContent) => {
+    logOutput.textContent = logContent;
+    logOutput.scrollTop = logOutput.scrollHeight;
+});
+
