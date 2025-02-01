@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const runScriptMenuItem = document.getElementById('run-script');
     const deleteScriptMenuItem = document.getElementById('delete-script');
     const viewlogScriptMenuItem = document.getElementById('view-log');
+    const deletelogScriptMenuItem = document.getElementById('delete-log');
 
     runScriptMenuItem.addEventListener('click', () => {
         if (selectedScript) {
@@ -75,6 +76,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log(`删除脚本: ${selectedScript.scriptName}`);
             ipcRenderer.send('delete-script', selectedScript);
             refreshScripts();
+        }
+    });
+
+    deletelogScriptMenuItem.addEventListener('click', () => {
+        console.log(selectedScript);
+        if (selectedScript) {
+            console.log(`清除脚本日志：${selectedScript.scriptName}`);
+            ipcRenderer.send('delete-log', selectedScript);
         }
     });
 });

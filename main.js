@@ -61,7 +61,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
     console.log(`Running script: ${command}`);
     const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
-    
+
     runningProcesses[selectedScript.scriptName] = process;
 
     if (selectedScript.runMode === "exec") {
@@ -85,13 +85,13 @@ ipcMain.on('run-script', (event, selectedScript) => {
             logStream.write(logData);
             event.sender.send('update-log', logData);
         });
-    
+
         scriptProcess.stderr.on('data', (data) => {
             const logData = `[STDERR] ${data}`;
             logStream.write(logData);
             event.sender.send('update-log', logData);
         });
-    
+
         scriptProcess.on('close', (code) => {
             const logData = `\n[Process Exited] Exit code: ${code}\n`;
             logStream.write(logData);
@@ -181,13 +181,17 @@ ipcMain.on('delete-script', (event, selectedScript) => {
     event.reply('script-deleted', selectedScript.scriptName);
 });
 
-ipcMain.on('view-log', (event, scriptName) => {
-    const logFilePath = path.join(__dirname, 'logs', `${scriptName}.log`);
+ipcMain.on('delete-log', (event, selectedScript) => {
+    const logFilePath = path.join(__dirname, 'logs', `${selectedScript.scriptName}.log`);
 
-    if (fs.existsSync(logFilePath)) {
-        const logContent = fs.readFileSync(logFilePath, 'utf-8');
+    fs.truncate(logFilePath, 0, (err) => {
+        if (err) {
+            console.error('清空文件失败:', err);
+        } else {
+            console.log('日志文件已清空');
+        }
+    });
 
-    }
 });
 
 ipcMain.on('get-log', (event, scriptName) => {
