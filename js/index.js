@@ -2,6 +2,7 @@ const { ipcRenderer } = require('electron');
 
 let scripts = [];
 const contextMenu = document.getElementById('context-menu');
+const logOutput = document.getElementById('log-output');
 let selectedScript = null;
 
 async function refreshScripts() {
@@ -63,15 +64,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     runScriptMenuItem.addEventListener('click', () => {
         if (selectedScript) {
-            console.log(`Runing: ${selectedScript}`);
-            
             ipcRenderer.send('run-script', selectedScript);
         }
         contextMenu.style.display = 'none';
     });
 
     deleteScriptMenuItem.addEventListener('click', () => {
-        console.log(selectedScript);
         if (selectedScript) {
             console.log(`删除脚本: ${selectedScript.scriptName}`);
             ipcRenderer.send('delete-script', selectedScript);
@@ -80,10 +78,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     deletelogScriptMenuItem.addEventListener('click', () => {
-        console.log(selectedScript);
         if (selectedScript) {
             console.log(`清除脚本日志：${selectedScript.scriptName}`);
             ipcRenderer.send('delete-log', selectedScript);
+            logOutput = '';
         }
     });
 });
@@ -126,8 +124,6 @@ document.getElementById('add-script-button').addEventListener('click', async () 
         console.error('打开对话框失败:', err);
     }
 });
-
-const logOutput = document.getElementById('log-output');
 
 ipcRenderer.on('update-log', (event, data) => {
     logOutput.textContent += `${data}\n`;

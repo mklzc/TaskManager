@@ -57,30 +57,59 @@ if (!fs.existsSync(logsDir)) {
 let runningProcesses = {};
 
 ipcMain.on('run-script', (event, selectedScript) => {
-    command = `${selectedScript.scriptPath} ${selectedScript.scriptParams}`;
-    console.log(`Running script: ${command}`);
+    let command;
+    ext = path.extname(selectedScript.scriptPath);
+    switch (ext) {
+        case '.py':
+            command = `python -u ${selectedScript.scriptPath}`;
+            break;
+        case '.sh':
+            command = `bash ${selectedScript.scriptPath}`;
+            break;
+        case '.js':
+            command = `node ${selectedScript.scriptPath}`;
+            break;
+        default:
+            command = `${selectedScript.scriptPath}`;
+    };
+    console.log(`Running script: ${command} ${selectedScript.scriptParams}`);
     const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
     runningProcesses[selectedScript.scriptName] = process;
 
     if (selectedScript.runMode === "exec") {
-        exec(`${command}`, (error, stdout, stderr) => {
+        exec(`${command}  ${selectedScript.scriptParams}`, (error, stdout, stderr) => {
+            let logData = `\n[${new Date().toLocaleString()}] 执行: ${scriptPath}\n`;
             if (error) {
                 console.error(`Error running script: ${error.message}`);
+                logData += `错误: ${error.message}\n`;
                 event.reply('script-result', error.message);
                 return;
             }
 
-            // fs.appendFileSync(logFilePath, logContent, 'utf-8');
-            console.log(`Script output: ${stdout}`);
-            event.reply('script-result', stdout);
+            if (stderr) {
+                logData += `[STDERR] ${stderr}\n`;
+            }
+
+            logData += `[STDOUT] ${stdout}\n`;
+            fs.appendFile(logFilePath, logData, 'utf-8', (err) => {
+                if (err) {
+                    console.error(`日志写入失败: ${err.message}`);
+                    event.reply('script-result', `日志写入失败: ${err.message}`);
+                } else {
+                    event.sender.send('update-log', logContent);
+                }
+            });
         });
     }
     else {
-        const scriptProcess = spawn(selectedScript.scriptPath, [selectedScript.scriptParams], { shell: true });
+        const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true });
+
+        console.log('spawn here');
 
         scriptProcess.stdout.on('data', (data) => {
+            console.log(`command's stdout ${data}`);
             const logData = `[STDOUT] ${data}`;
             logStream.write(logData);
             event.sender.send('update-log', logData);
