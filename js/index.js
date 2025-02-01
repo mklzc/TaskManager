@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const runScriptMenuItem = document.getElementById('run-script');
     const deleteScriptMenuItem = document.getElementById('delete-script');
-    const viewlogScriptMenuItem = document.getElementById('view-log');
     const deletelogScriptMenuItem = document.getElementById('delete-log');
 
     runScriptMenuItem.addEventListener('click', () => {
@@ -135,3 +134,18 @@ ipcRenderer.on('load-log', (event, logContent) => {
     logOutput.scrollTop = logOutput.scrollHeight;
 });
 
+ipcRenderer.on('status-update', (event, { scriptName, status }) => {
+    let scriptItem = null;
+    document.querySelectorAll(".script-item").forEach(item => {
+        if (item.textContent.trim() === scriptName) {
+            scriptItem = item;
+        }
+    });
+    if (scriptItem) {
+        if (status === 'running') {
+            scriptItem.classList.add('running');
+        } else {
+            scriptItem.classList.remove('running');
+        }
+    }
+});

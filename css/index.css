@@ -153,3 +153,8 @@
 #context-menu .menu-item:hover {
     background-color: #f0f0f0;
 }
+
+.script-item.running::before {
+    content: '运行中 ';
+    color: #0f0;
+}

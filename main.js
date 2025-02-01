@@ -77,6 +77,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
     runningProcesses[selectedScript.scriptName] = process;
+    event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'running' });
 
     if (selectedScript.runMode === "exec") {
         exec(`${command}  ${selectedScript.scriptParams}`, (error, stdout, stderr) => {
@@ -122,9 +123,11 @@ ipcMain.on('run-script', (event, selectedScript) => {
         });
 
         scriptProcess.on('close', (code) => {
+            delete runningProcesses[selectedScript.scriptName];
             const logData = `\n[Process Exited] Exit code: ${code}\n`;
             logStream.write(logData);
             logStream.end();
+            event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'stopped' });
             event.sender.send('update-log', logData);
         });
     }
