@@ -24,7 +24,7 @@ function renderScripts() {
         listItem.className = 'script-item';
 
         listItem.addEventListener('click', () => {
-            selectScript(listItem, script.scriptName);
+            selectScript(listItem, script);
             ipcRenderer.send('get-log', script.scriptName);
         });
 
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-function selectScript(listItem, scriptName) {
+function selectScript(listItem, script) {
     // 移除之前选中的样式
     const prevSelected = document.querySelector('.script-item.selected');
     if (prevSelected) {
@@ -94,9 +94,9 @@ function selectScript(listItem, scriptName) {
 
     // 更新当前选中项
     listItem.classList.add('selected');
-    selectedScript = scriptName;
+    selectedScript = script;
 
-    console.log('选中脚本:', scriptName);
+    console.log('选中脚本:', script.scriptName);
 }
 
 document.getElementById('run-button').addEventListener('click', () => {
@@ -104,11 +104,20 @@ document.getElementById('run-button').addEventListener('click', () => {
 
     const selectedItem = document.querySelector('#script-list .selected');
     
-    const selectedScript = scripts.find(s => s.scriptName === selectedItem.textContent);
+    selectedScript = scripts.find(s => s.scriptName === selectedItem.textContent);
 
     ipcRenderer.send('run-script', selectedScript);
 });
 
+document.getElementById('stop-button').addEventListener('click', () => {
+    if (selectedScript) {
+        console.log(`stopping ${selectedScript.scriptName}`);
+        ipcRenderer.send('stop-script', selectedScript.scriptName);
+    }
+    else {
+        console.log("请先选择一个脚本");
+    }
+});
 
 document.getElementById('add-script-button').addEventListener('click', async () => {
     try {

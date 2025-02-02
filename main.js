@@ -57,6 +57,11 @@ if (!fs.existsSync(logsDir)) {
 let runningProcesses = {};
 
 ipcMain.on('run-script', (event, selectedScript) => {
+    if (runningProcesses[selectedScript.scriptName]) {
+        console.log(`${selectedScript.scriptName} 已在运行中`);
+        return;
+    }
+
     let command;
     ext = path.extname(selectedScript.scriptPath);
     switch (ext) {
@@ -76,7 +81,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
     const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
-    runningProcesses[selectedScript.scriptName] = process;
+    
     event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'running' });
 
     if (selectedScript.runMode === "exec") {
@@ -106,9 +111,8 @@ ipcMain.on('run-script', (event, selectedScript) => {
     }
     else {
         const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true });
-
-        console.log('spawn here');
-
+        console.log(`${selectedScript.scriptName} 已在运行中`);
+        runningProcesses[selectedScript.scriptName] = scriptProcess;
         scriptProcess.stdout.on('data', (data) => {
             console.log(`command's stdout ${data}`);
             const logData = `[STDOUT] ${data}`;
@@ -130,6 +134,28 @@ ipcMain.on('run-script', (event, selectedScript) => {
             event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'stopped' });
             event.sender.send('update-log', logData);
         });
+    }
+});
+
+ipcMain.on('stop-script', (event, scriptName) => {
+    const scriptProcess = runningProcesses[scriptName];
+
+    if (scriptProcess) {
+        const pid = scriptProcess.pid;
+        console.log(`trying to kill ${pid} ${process.platform}`)
+        if (process.platform === 'win32') {
+            console.log(`exec taskkill /PID ${pid} /T /F`);
+            exec(`taskkill /PID ${pid} /T /F`, (error) => {
+                if (error) {
+                    console.error(`终止 ${scriptName} 失败:`, error);
+                } else {
+                    console.log(`${scriptName} 已被成功终止`);
+                }
+            });
+        } else {
+            // Unix/Linux
+            scriptProcess.kill(-pid);
+        }
     }
 });
 
