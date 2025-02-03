@@ -81,7 +81,6 @@ ipcMain.on('run-script', (event, selectedScript) => {
     const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
 
-    
     event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'running' });
 
     if (selectedScript.runMode === "exec") {
@@ -102,7 +101,6 @@ ipcMain.on('run-script', (event, selectedScript) => {
             fs.appendFile(logFilePath, logData, 'utf-8', (err) => {
                 if (err) {
                     console.error(`日志写入失败: ${err.message}`);
-                    event.reply('script-result', `日志写入失败: ${err.message}`);
                 } else {
                     event.sender.send('update-log', logContent);
                 }
@@ -113,6 +111,9 @@ ipcMain.on('run-script', (event, selectedScript) => {
         const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true });
         console.log(`${selectedScript.scriptName} 已在运行中`);
         runningProcesses[selectedScript.scriptName] = scriptProcess;
+        const logDate = `\n[${new Date().toLocaleString()}] 执行: ${selectedScript.scriptName}\n`;
+        logStream.write(logDate);
+        event.sender.send('update-log', logDate);
         scriptProcess.stdout.on('data', (data) => {
             console.log(`command's stdout ${data}`);
             const logData = `[STDOUT] ${data}`;
@@ -129,8 +130,10 @@ ipcMain.on('run-script', (event, selectedScript) => {
         scriptProcess.on('close', (code) => {
             delete runningProcesses[selectedScript.scriptName];
             const logData = `\n[Process Exited] Exit code: ${code}\n`;
+            
             logStream.write(logData);
             logStream.end();
+        
             event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'stopped' });
             event.sender.send('update-log', logData);
         });
@@ -150,6 +153,7 @@ ipcMain.on('stop-script', (event, scriptName) => {
                     console.error(`终止 ${scriptName} 失败:`, error);
                 } else {
                     console.log(`${scriptName} 已被成功终止`);
+                    event.sender.send('status-update', { scriptName: scriptName, status: 'stopped' });
                 }
             });
         } else {

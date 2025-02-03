@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (selectedScript) {
             console.log(`清除脚本日志：${selectedScript.scriptName}`);
             ipcRenderer.send('delete-log', selectedScript);
-            logOutput = '';
+            logOutput.textContent = '';
         }
     });
 });
@@ -90,10 +90,18 @@ function selectScript(listItem, script) {
     const prevSelected = document.querySelector('.script-item.selected');
     if (prevSelected) {
         prevSelected.classList.remove('selected');
+        if (prevSelected.classList.contains('selected-line')) {
+            prevSelected.classList.remove('selected-line');
+        }
     }
 
     // 更新当前选中项
     listItem.classList.add('selected');
+
+    if (!listItem.classList.contains('running')) {
+        listItem.classList.add('selected-line');
+    }
+    
     selectedScript = script;
 
     console.log('选中脚本:', script.scriptName);
@@ -144,17 +152,23 @@ ipcRenderer.on('load-log', (event, logContent) => {
 });
 
 ipcRenderer.on('status-update', (event, { scriptName, status }) => {
+
+    console.log(`changing status ${scriptName} to ${status}`);
+
     let scriptItem = null;
     document.querySelectorAll(".script-item").forEach(item => {
         if (item.textContent.trim() === scriptName) {
             scriptItem = item;
         }
     });
+    console.log(scriptItem.innerHTML);
     if (scriptItem) {
         if (status === 'running') {
             scriptItem.classList.add('running');
+            scriptItem.classList.remove('selected-line');
         } else {
             scriptItem.classList.remove('running');
+            scriptItem.classList.add('selected-line');
         }
     }
 });
