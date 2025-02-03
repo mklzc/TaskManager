@@ -55,7 +55,12 @@ function createWindow() {
             createTray();
         }
         return false;
-    })
+    });
+
+    fs.watchFile(scriptsJsonPath, () => {
+        console.log("Scripts.json updated.");
+        mainWindow.webContents.send("scripts-updated");
+    });
 
     // 打开开发者工具（调试用）
     mainWindow.webContents.openDevTools();
@@ -253,11 +258,6 @@ ipcMain.handle('save-script-data', (event, scriptData) => {
     // 写入文件
     fs.writeFileSync(scriptsJsonPath, JSON.stringify(scripts, null, 2), 'utf-8');
     console.log('脚本已保存:', scriptData);
-});
-
-fs.watchFile(scriptsJsonPath, () => {
-    console.log("Scripts.json updated.");
-    mainWindow.webContents.send("scripts-updated");
 });
 
 ipcMain.on('delete-script', (event, selectedScript) => {
