@@ -6,7 +6,8 @@
     "start": "electron-forge start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify"
   },
   "author": "",
   "license": "ISC",
@@ -20,12 +21,12 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.6.1",
     "@electron-forge/plugin-fuses": "^7.6.1",
     "@electron/fuses": "^1.8.0",
-    "autoprefixer": "^10.4.20",
     "electron": "^34.0.1",
-    "postcss-loader": "^8.1.1",
+    "electron-installer-common": "^0.10.4",
     "tailwindcss": "^4.0.3"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "word-wrap": "^1.2.5"
   }
 }

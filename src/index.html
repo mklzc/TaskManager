@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/btn.css">
+    <link rel="stylesheet" href="css/input.css">
+    <link rel="stylesheet" href="../dist/styles.css">
+    <title>Electron App</title>
+</head>
+
+<body>
+    <div id="container">
+        <ul id="script-list" class="custom-list"></ul>
+
+        <div id="log-container">
+            <pre id="log-output"></pre>
+        </div>
+    </div>
+    <div id="context-menu">
+        <div class="menu-item" id="run-script">运行脚本</div>
+        <div class="menu-item" id="delete-script">删除脚本</div>
+        <div class="menu-item" id="delete-log">清除日志</div>
+    </div>
+    <!-- <button id="add-script-button" class="main-btn">添加任务</button>
+    <button id="run-button" class="main-btn">运行任务</button>
+    <button id="stop-button" class="stop-btn">结束任务</button> -->
+    <button id="add-script-button"
+        class="main-btn bg-gradient-to-r from-blue-400 to-green-500 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-green-500 hover:to-blue-400 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm">
+        添加任务
+    </button>
+
+    <button id="run-button"
+        class="main-btn bg-gradient-to-r from-blue-400 to-green-500 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-green-500 hover:to-blue-400 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm">
+        运行任务
+    </button>
+
+    <button id="stop-button"
+        class="stop-btn bg-gradient-to-r from-red-600 to-red-700 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-red-700 hover:to-red-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm disabled:from-red-300 disabled:to-red-400 disabled:cursor-not-allowed disabled:opacity-70 disabled:shadow-none">
+        结束任务
+    </button>
+
+    <script src="js/index.js"></script>
+</body>
+
+</html>

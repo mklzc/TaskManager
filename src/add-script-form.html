@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>添加脚本</title>
+  <link rel="stylesheet" href="css/input.css">
+  <link rel="stylesheet" href="css/add-script-form.css">
+  <link rel="stylesheet" href="../dist/styles.css">
+</head>
+
+<body>
+  <form id="scriptForm" class="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md space-y-4">
+    <!-- 脚本名称 -->
+    <div class="flex flex-col items-start">
+      <label for="scriptName" class="text-[16px] mb-2 text-gray-600">脚本名称:</label>
+      <input
+        type="text"
+        id="scriptName"
+        required
+        placeholder="请输入脚本名称"
+        class="w-full px-4 py-3 text-[16px] text-gray-800 bg-white border border-gray-300 rounded-full shadow-sm outline-none transition-all duration-300 
+               placeholder-gray-400 placeholder-italic 
+               focus:border-blue-400 focus:shadow-lg focus:shadow-blue-300/50 
+               hover:border-green-400 
+               active:shadow-md active:shadow-blue-300/30
+               box-border"
+      />
+    </div>
+  
+    <!-- 脚本路径 -->
+    <div class="flex flex-col items-start">
+      <label for="scriptPath" class="text-[16px] mb-2 text-gray-600">脚本路径:</label>
+      <input
+        type="text"
+        id="scriptPath"
+        required
+        placeholder="请输入脚本路径"
+        class="w-full px-4 py-3 text-[16px] text-gray-800 bg-white border border-gray-300 rounded-full shadow-sm outline-none transition-all duration-300 
+               placeholder-gray-400 placeholder-italic 
+               focus:border-blue-400 focus:shadow-lg focus:shadow-blue-300/50 
+               hover:border-green-400 
+               active:shadow-md active:shadow-blue-300/30
+               box-border"
+      />
+    </div>
+  
+    <!-- 脚本参数 -->
+    <div class="flex flex-col items-start">
+      <label for="scriptParams" class="text-[16px] mb-2 text-gray-600">脚本参数:</label>
+      <input
+        type="text"
+        id="scriptParams"
+        placeholder="可选参数"
+        class="w-full px-4 py-3 text-[16px] text-gray-800 bg-white border border-gray-300 rounded-full shadow-sm outline-none transition-all duration-300 
+               placeholder-gray-400 placeholder-italic 
+               focus:border-blue-400 focus:shadow-lg focus:shadow-blue-300/50 
+               hover:border-green-400 
+               active:shadow-md active:shadow-blue-300/30
+               box-border"
+      />
+    </div>
+    <label style="margin-right: 10px;"></label>
+      <input type="radio" name="run-mode" value="exec" checked> 直接运行
+    </label>
+    <label style="display: inline-block;">
+      <input type="radio" name="run-mode" value="spawn"> 后台运行
+    </label>
+    <br>
+
+    <button type="submit"
+      class="bg-gradient-to-r from-blue-400 to-green-500 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-green-500 hover:to-blue-400 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm">
+      确定
+    </button>
+    <button type="button" id="cancelButton" class="stop-btn bg-gradient-to-r from-red-600 to-red-700 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-red-700 hover:to-red-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm disabled:from-red-300 disabled:to-red-400 disabled:cursor-not-allowed disabled:opacity-70 disabled:shadow-none">
+      取消
+    </button>
+  </form>
+  
+
+  <script src="js/add-script-form.js"></script>
+</body>
+
+</html>

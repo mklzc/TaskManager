@@ -45,7 +45,7 @@ function createWindow() {
         },
     });
 
-    mainWindow.loadFile('index.html');
+    mainWindow.loadFile('./src/index.html');
     createTray();
 
     mainWindow.on('close', (event) => {
@@ -219,7 +219,7 @@ ipcMain.handle('open-add-script-form', async () => {
     });
 
     // 加载表单页面
-    addScriptWindow.loadFile('add-script-form.html');
+    addScriptWindow.loadFile('./src/add-script-form.html');
 
     // 显示窗口
     addScriptWindow.once('ready-to-show', () => {
