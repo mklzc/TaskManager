@@ -1,9 +1,39 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
 const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 let mainWindow;
+let tray = null;
+
+function createTray() {
+    if (tray) return;  // 防止重复创建托盘图标
+
+    tray = new Tray(path.join(__dirname, 'assets/icon.ico'));
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: '显示主界面',
+            click: () => {
+                mainWindow.show();
+            }
+        },
+        {
+            label: '退出',
+            click: () => {
+                app.isQuiting = true;
+                app.quit();
+            }
+        }
+    ]);
+
+    tray.setToolTip('任务管理器');
+    tray.setContextMenu(contextMenu);
+
+    // 双击托盘图标显示主界面
+    tray.on('double-click', () => {
+        mainWindow.show();
+    });
+}
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -16,6 +46,17 @@ function createWindow() {
     });
 
     mainWindow.loadFile('index.html');
+    createTray();
+
+    mainWindow.on('close', (event) => {
+        if (!app.isQuiting) {
+            event.preventDefault();
+            mainWindow.hide();
+            createTray();
+        }
+        return false;
+    })
+
     // 打开开发者工具（调试用）
     mainWindow.webContents.openDevTools();
 }
