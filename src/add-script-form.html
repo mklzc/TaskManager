@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>添加脚本</title>
-  <link rel="stylesheet" href="css/input.css">
+  <!-- <link rel="stylesheet" href="css/input.css"> -->
   <link rel="stylesheet" href="css/add-script-form.css">
   <link rel="stylesheet" href="../dist/styles.css">
 </head>
@@ -61,24 +61,34 @@
                box-border"
       />
     </div>
-    <label style="margin-right: 10px;"></label>
-      <input type="radio" name="run-mode" value="exec" checked> 直接运行
-    </label>
-    <label style="display: inline-block;">
-      <input type="radio" name="run-mode" value="spawn"> 后台运行
-    </label>
+    <div class="flex space-x-4">
+      <label class="flex items-center cursor-pointer p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-200 space-x-2">
+        <span class="flex items-center space-x-2">
+          <input type="radio" name="run-mode" value="exec" checked class="hidden peer">
+          <div class="w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-[#98FF98] peer-checked:bg-[#98FF98] transition"></div>
+          <span class="text-gray-800">直接运行</span>
+        </span>
+      </label>
+    
+      <label class="flex items-center cursor-pointer p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-200 space-x-2">
+        <span class="flex items-center space-x-2">
+          <input type="radio" name="run-mode" value="spawn" class="hidden peer">
+          <div class="w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-[#98FF98] peer-checked:bg-[#98FF98] transition"></div>
+          <span class="text-gray-800">后台运行</span>
+        </span>
+      </label>
+    </div>
     <br>
 
     <button type="submit"
       class="bg-gradient-to-r from-blue-400 to-green-500 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-green-500 hover:to-blue-400 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm">
       确定
     </button>
-    <button type="button" id="cancelButton" class="stop-btn bg-gradient-to-r from-red-600 to-red-700 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-red-700 hover:to-red-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm disabled:from-red-300 disabled:to-red-400 disabled:cursor-not-allowed disabled:opacity-70 disabled:shadow-none">
+    <button type="button" id="cancelButton" class="bg-gradient-to-r from-red-600 to-red-700 text-white border-none px-6 py-3 text-lg font-bold rounded-full shadow-md cursor-pointer transition-all duration-300 ease-in-out hover:from-red-700 hover:to-red-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 active:shadow-sm disabled:from-red-300 disabled:to-red-400 disabled:cursor-not-allowed disabled:opacity-70 disabled:shadow-none">
       取消
     </button>
   </form>
   
-
   <script src="js/add-script-form.js"></script>
 </body>
 

@@ -4,6 +4,12 @@ const form = document.getElementById('scriptForm');
 const cancelButton = document.getElementById('cancelButton');
 
 // 提交表单
+
+cancelButton.addEventListener('click', (event) => {
+    console.log("Cancel Add Task");
+    window.close();
+});
+
 form.addEventListener('submit', (event) => {
     event.preventDefault();  // 阻止默认表单提交行为
 

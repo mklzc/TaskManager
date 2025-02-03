@@ -133,14 +133,6 @@
     background: rgba(0, 0, 0, 0.3);
 }
 
-
-#run-button {
-    margin-top: 60px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
 #context-menu {
     display: none;
     position: absolute;
