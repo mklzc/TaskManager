@@ -5,18 +5,19 @@ const contextMenu = document.getElementById('context-menu');
 const logOutput = document.getElementById('log-output');
 let selectedScript = null;
 
+// ------刷新任务列表------
 async function refreshScripts() {
     console.log('Refreshing Scripts...');
     scripts = await ipcRenderer.invoke('load-scripts');
     renderScripts();
 }
 
+// ------渲染任务列表------
 function renderScripts() {
     const scriptList = document.getElementById('script-list');
     console.log('Renderer: Loading scripts...');
     console.log('Renderer: Received scripts:', scripts);
 
-    // 更新脚本列表
     scriptList.innerHTML = '';
     scripts.forEach((script) => {
         const listItem = document.createElement('li');
@@ -44,10 +45,12 @@ function renderScripts() {
     });
 }
 
+// ------基本功能加载（右键菜单）------
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Renderer: DOM Content Loaded'); // 确认渲染进程启动
     await refreshScripts();
 
+    // 监听任务列表的改变
     ipcRenderer.on('scripts-updated', async () => {
         console.log('Scripts updates recieved');
         await refreshScripts();
@@ -85,6 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+// ------选择任务------
 function selectScript(listItem, script) {
     // 移除之前选中的样式
     const prevSelected = document.querySelector('.script-item.selected');
@@ -103,10 +107,10 @@ function selectScript(listItem, script) {
     }
     
     selectedScript = script;
-
     console.log('选中脚本:', script.scriptName);
 }
 
+// ------运行任务按钮------
 document.getElementById('run-button').addEventListener('click', () => {
     console.log('run-button clicked');
 
@@ -117,6 +121,7 @@ document.getElementById('run-button').addEventListener('click', () => {
     ipcRenderer.send('run-script', selectedScript);
 });
 
+// ------结束任务按钮------
 document.getElementById('stop-button').addEventListener('click', () => {
     if (selectedScript) {
         console.log(`stopping ${selectedScript.scriptName}`);
@@ -127,6 +132,7 @@ document.getElementById('stop-button').addEventListener('click', () => {
     }
 });
 
+// ------添加任务按钮------
 document.getElementById('add-script-button').addEventListener('click', async () => {
     try {
         const result = await ipcRenderer.invoke('open-add-script-form');
@@ -141,7 +147,7 @@ document.getElementById('add-script-button').addEventListener('click', async () 
     }
 });
 
-
+// ------编辑任务按钮------
 document.getElementById('edit-button').addEventListener('click', async () => {
     if (selectedScript) {
         try {
@@ -154,16 +160,21 @@ document.getElementById('edit-button').addEventListener('click', async () => {
     }
 })
 
-ipcRenderer.on('update-log', (event, data) => {
-    logOutput.textContent += `${data}\n`;
-    logOutput.scrollTop = logOutput.scrollHeight; // 滚动到底部
+// ------更新日志界面------
+ipcRenderer.on('update-log', (event, data, scriptName) => {
+    if (scriptName === selectedScript.scriptName) {
+        logOutput.textContent += `${data}\n`;
+        logOutput.scrollTop = logOutput.scrollHeight; // 滚动到底部
+    }
 });
 
+// ------加载日志界面------
 ipcRenderer.on('load-log', (event, logContent) => {
     logOutput.textContent = logContent;
     logOutput.scrollTop = logOutput.scrollHeight;
 });
 
+// ------运行状态更新------
 ipcRenderer.on('status-update', (event, { scriptName, status }) => {
 
     console.log(`changing status ${scriptName} to ${status}`);

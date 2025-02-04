@@ -10,7 +10,9 @@ cancelButton.addEventListener('click', (event) => {
 
 ipcRenderer.on('load-script-data', (event, scriptData) => {
     console.log("接收到脚本数据:", scriptData);
+
     document.getElementById('scriptName').value = scriptData.scriptName;
+    document.getElementById('scriptName').readOnly = true;
     document.getElementById('scriptPath').value = scriptData.scriptPath;
     document.getElementById('scriptParams').value = scriptData.scriptParams;
 

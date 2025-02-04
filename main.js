@@ -152,7 +152,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
                 if (err) {
                     console.error(`日志写入失败: ${err.message}`);
                 } else {
-                    event.sender.send('update-log', logContent);
+                    event.sender.send('update-log', logContent, selectedScript.scriptName);
                 }
             });
         });
@@ -164,18 +164,18 @@ ipcMain.on('run-script', (event, selectedScript) => {
         runningProcesses[selectedScript.scriptName] = scriptProcess;
         const logDate = `\n[${new Date().toLocaleString()}] 执行: ${selectedScript.scriptName}\n`;
         logStream.write(logDate);
-        event.sender.send('update-log', logDate);
+        event.sender.send('update-log', logDate, selectedScript.scriptName);
         scriptProcess.stdout.on('data', (data) => {
             console.log(`command's stdout ${data}`);
             const logData = `[STDOUT] ${data}`;
             logStream.write(logData);
-            event.sender.send('update-log', logData);
+            event.sender.send('update-log', logData, selectedScript.scriptName);
         });
 
         scriptProcess.stderr.on('data', (data) => {
             const logData = `[LOG] ${data}`;
             logStream.write(logData);
-            event.sender.send('update-log', logData);
+            event.sender.send('update-log', logData, selectedScript.scriptName);
         });
 
         scriptProcess.on('close', (code) => {
@@ -186,7 +186,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
             logStream.end();
         
             event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'stopped' });
-            event.sender.send('update-log', logData);
+            event.sender.send('update-log', logData, selectedScript.scriptName);
         });
     }
 });
@@ -345,7 +345,12 @@ ipcMain.on('get-log', (event, scriptName) => {
     const logFilePath = path.join(logsDir, `${scriptName}.log`);
     if (fs.existsSync(logFilePath)) {
         const logContent = fs.readFileSync(logFilePath, 'utf-8');
-        event.reply('load-log', logContent);
+        if (logContent.trim().length === 0) {
+            event.reply('load-log', '[No log available]');
+        }
+        else {
+            event.reply('load-log', logContent);
+        }
     } else {
         event.reply('load-log', '[No log available]');
     }
