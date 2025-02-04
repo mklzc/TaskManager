@@ -118,6 +118,9 @@ ipcMain.on('run-script', (event, selectedScript) => {
         case '.sh':
             command = `bash ${selectedScript.scriptPath}`;
             break;
+        case '.bat':
+            command = ``;
+            break;
         case '.js':
             command = `node ${selectedScript.scriptPath}`;
             break;
@@ -127,11 +130,11 @@ ipcMain.on('run-script', (event, selectedScript) => {
     console.log(`Running script: ${command} ${selectedScript.scriptParams}`);
     const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
-
+    const directoryPath = path.dirname(selectedScript.scriptPath);
     event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'running' });
 
     if (selectedScript.runMode === "exec") {
-        exec(`${command}  ${selectedScript.scriptParams}`, (error, stdout, stderr) => {
+        exec(`${command}  ${selectedScript.scriptParams}`, { cwd: directoryPath }, (error, stdout, stderr) => {
             let logData = `\n[${new Date().toLocaleString()}] 执行: ${scriptPath}\n`;
             if (error) {
                 console.error(`Error running script: ${error.message}`);
@@ -155,8 +158,9 @@ ipcMain.on('run-script', (event, selectedScript) => {
         });
     }
     else {
-        const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true });
-        console.log(`${selectedScript.scriptName} 已在运行中`);
+
+        const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true, cwd: directoryPath});
+        console.log(`${selectedScript.scriptName} spawn here ${command} ${selectedScript.scriptParams}`);
         runningProcesses[selectedScript.scriptName] = scriptProcess;
         const logDate = `\n[${new Date().toLocaleString()}] 执行: ${selectedScript.scriptName}\n`;
         logStream.write(logDate);
@@ -169,7 +173,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
         });
 
         scriptProcess.stderr.on('data', (data) => {
-            const logData = `[STDERR] ${data}`;
+            const logData = `[LOG] ${data}`;
             logStream.write(logData);
             event.sender.send('update-log', logData);
         });

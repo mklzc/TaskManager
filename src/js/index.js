@@ -167,7 +167,6 @@ ipcRenderer.on('load-log', (event, logContent) => {
 ipcRenderer.on('status-update', (event, { scriptName, status }) => {
 
     console.log(`changing status ${scriptName} to ${status}`);
-
     let scriptItem = null;
     document.querySelectorAll(".script-item").forEach(item => {
         if (item.textContent.trim() === scriptName) {
