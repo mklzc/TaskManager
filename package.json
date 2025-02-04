@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify"
+    "build:css": "@tailwindcss/cli -i ./src/styles.css -o ./dist/styles.css"
   },
   "author": "",
   "license": "ISC",

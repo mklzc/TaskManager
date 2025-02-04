@@ -141,6 +141,19 @@ document.getElementById('add-script-button').addEventListener('click', async () 
     }
 });
 
+
+document.getElementById('edit-button').addEventListener('click', async () => {
+    if (selectedScript) {
+        try {
+            ipcRenderer.invoke('edit-script', selectedScript);
+        } catch (err) {
+            console.log("编辑失败");
+        }
+    } else {
+        console.log("请先选择一个脚本");
+    }
+})
+
 ipcRenderer.on('update-log', (event, data) => {
     logOutput.textContent += `${data}\n`;
     logOutput.scrollTop = logOutput.scrollHeight; // 滚动到底部

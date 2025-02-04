@@ -19,6 +19,9 @@ form.addEventListener('submit', (event) => {
     const runMode = document.querySelector('input[name="run-mode"]:checked').value;
 
     // 发送脚本信息到主进程
+
+    console.log({ scriptName, scriptPath, scriptParams, runMode });
+    
     ipcRenderer.invoke('save-script-data', { scriptName, scriptPath, scriptParams, runMode });
 
     // 关闭窗口

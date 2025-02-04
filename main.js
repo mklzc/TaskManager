@@ -5,9 +5,18 @@ const path = require('path');
 
 let mainWindow;
 let tray = null;
+let runningProcesses = {};
 
+const scriptsJsonPath = path.join(__dirname, 'scripts.json');
+const logsDir = path.join(__dirname, 'logs');
+
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+}
+
+// ------创建托盘图标------
 function createTray() {
-    if (tray) return;  // 防止重复创建托盘图标
+    if (tray) return;
 
     tray = new Tray(path.join(__dirname, 'assets/icon.ico'));
     const contextMenu = Menu.buildFromTemplate([
@@ -29,12 +38,12 @@ function createTray() {
     tray.setToolTip('任务管理器');
     tray.setContextMenu(contextMenu);
 
-    // 双击托盘图标显示主界面
     tray.on('double-click', () => {
         mainWindow.show();
     });
 }
 
+// ------创建窗口------
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
@@ -74,12 +83,10 @@ app.whenReady().then(() => {
     });
 });
 
-// 加载脚本
+// ------加载任务内容------
 ipcMain.handle('load-scripts', async () => {
     console.log('ipcMain: Received load-scripts request');
     try {
-        const scriptsJsonPath = path.join(__dirname, 'scripts.json');
-
         if (!fs.existsSync(scriptsJsonPath)) {
             console.log('scripts.json not found, creating an empty one.');
             fs.writeFileSync(scriptsJsonPath, '', 'utf-8');
@@ -95,13 +102,7 @@ ipcMain.handle('load-scripts', async () => {
     }
 });
 
-const logsDir = path.join(__dirname, 'logs');
-if (!fs.existsSync(logsDir)) {
-    fs.mkdirSync(logsDir, { recursive: true });
-}
-
-let runningProcesses = {};
-
+// ------运行任务------
 ipcMain.on('run-script', (event, selectedScript) => {
     if (runningProcesses[selectedScript.scriptName]) {
         console.log(`${selectedScript.scriptName} 已在运行中`);
@@ -186,6 +187,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
     }
 });
 
+// ------停止任务------
 ipcMain.on('stop-script', (event, scriptName) => {
     const scriptProcess = runningProcesses[scriptName];
 
@@ -209,28 +211,26 @@ ipcMain.on('stop-script', (event, scriptName) => {
     }
 });
 
+// ------添加任务------
 ipcMain.handle('open-add-script-form', async () => {
-    // 打开自定义的 HTML 页面作为对话框
     let addScriptWindow = new BrowserWindow({
         width: 800,
         height: 600,
         parent: mainWindow,
         modal: true,
-        show: false,  // 初始化不显示，待加载完成后显示
+        show: false,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false, // 如果启用了 contextIsolation，请根据需要调整预加载脚本
+            contextIsolation: false,
         },
     });
-
-    // 加载表单页面
     addScriptWindow.loadFile('./src/add-script-form.html');
 
-    // 显示窗口
     addScriptWindow.once('ready-to-show', () => {
         addScriptWindow.show();
     });
 
+    addScriptWindow.webContents.openDevTools();
     return new Promise((resolve, reject) => {
         addScriptWindow.on('close', () => {
             resolve('窗口已关闭');
@@ -238,13 +238,8 @@ ipcMain.handle('open-add-script-form', async () => {
     });
 });
 
-// 保存脚本数据到 JSON 文件
-const scriptsJsonPath = path.join(__dirname, 'scripts.json');
 ipcMain.handle('save-script-data', (event, scriptData) => {
     let scripts = [];
-
-    // 检查文件是否存在
-    const scriptsJsonPath = path.join(__dirname, 'scripts.json');
 
     const fileContent = fs.readFileSync(scriptsJsonPath, 'utf-8');
     if (fileContent.trim() === '') {
@@ -255,10 +250,54 @@ ipcMain.handle('save-script-data', (event, scriptData) => {
     }
     scripts.push(scriptData);
 
-    // 写入文件
     fs.writeFileSync(scriptsJsonPath, JSON.stringify(scripts, null, 2), 'utf-8');
     console.log('脚本已保存:', scriptData);
 });
+
+// ------编辑任务内容------
+
+ipcMain.handle('edit-script', async (event, selectedScript) => {
+    let editScriptWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        parent: mainWindow,
+        modal: true,
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
+    });
+
+    editScriptWindow.loadFile('./src/edit-script-form.html');
+    editScriptWindow.once('ready-to-show', () => {
+        editScriptWindow.show();
+        console.log("send selectedScript to edit", selectedScript);
+        editScriptWindow.webContents.send('load-script-data', selectedScript);
+    });
+    editScriptWindow.webContents.openDevTools();
+});
+
+ipcMain.handle('update-script-data', (event, updatedScript) => {
+    console.log("recieve updatedScript", updatedScript);
+    let scripts = [];
+    
+    const fileContent = fs.readFileSync(scriptsJsonPath, 'utf-8');
+    if (fileContent.trim() === '') {
+        scripts = [];
+    }
+    else {
+        scripts = JSON.parse(fileContent);
+    }
+
+    const index = scripts.findIndex(script => script.scriptName === updatedScript.scriptName);
+    if (index !== -1) {
+        scripts[index] = updatedScript;
+    }
+    fs.writeFileSync(scriptsJsonPath, JSON.stringify(scripts, null, 2), 'utf-8');
+});
+
+// --------删除任务--------
 
 ipcMain.on('delete-script', (event, selectedScript) => {
     if (!fs.existsSync(scriptsJsonPath)) {
@@ -275,7 +314,7 @@ ipcMain.on('delete-script', (event, selectedScript) => {
     console.log(updatedScripts);
 
     if (updatedScripts.length === scripts.length) {
-        // 未找到待删除脚本
+        // 未找到待删除任务
         console.log(`Error find selectedScript ${selectedScript.scriptName}`);
         return;
     }
@@ -284,9 +323,10 @@ ipcMain.on('delete-script', (event, selectedScript) => {
     event.reply('script-deleted', selectedScript.scriptName);
 });
 
+// ------删除日志------
+
 ipcMain.on('delete-log', (event, selectedScript) => {
     const logFilePath = path.join(__dirname, 'logs', `${selectedScript.scriptName}.log`);
-
     fs.truncate(logFilePath, 0, (err) => {
         if (err) {
             console.error('清空文件失败:', err);
@@ -294,9 +334,9 @@ ipcMain.on('delete-log', (event, selectedScript) => {
             console.log('日志文件已清空');
         }
     });
-
 });
 
+// ------获取日志------
 ipcMain.on('get-log', (event, scriptName) => {
     const logFilePath = path.join(logsDir, `${scriptName}.log`);
     if (fs.existsSync(logFilePath)) {
