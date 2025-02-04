@@ -10,9 +10,20 @@
 </head>
 
 <body>
+  
   <form id="scriptForm" class="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md space-y-4">
     <div class="flex flex-col items-start">
-      <label for="scriptName" class="text-[16px] mb-2 text-gray-600">任务名称:</label>
+      <div class="flex items-center space-x-2">
+        <label for="scriptName" class="text-[16px] text-gray-600">任务名称</label>
+
+        <div class="relative group align-middle">
+          <img src="../assets/alert.png" alt="帮助" class="mb-1 align-middle w-6 h-6 cursor-pointer object-contain hover:scale-105 transition-transform">
+          <div class="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 p-2 bg-white text-xs text-gray-700 rounded-md shadow-lg border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+            任务名称一经确定，不能更改。
+            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-l border-t border-gray-300 rotate-45"></div>
+          </div>
+        </div>
+      </div>
       <input
         type="text"
         id="scriptName"
@@ -28,7 +39,7 @@
     </div>
 
     <div class="flex flex-col items-start">
-      <label for="scriptPath" class="text-[16px] mb-2 text-gray-600">任务路径:</label>
+      <label for="scriptPath" class="text-[16px] text-gray-600">任务路径:</label>
       <input
         type="text"
         id="scriptPath"
@@ -43,9 +54,8 @@
       />
     </div>
   
-    <!-- 脚本参数 -->
     <div class="flex flex-col items-start">
-      <label for="scriptParams" class="text-[16px] mb-2 text-gray-600">任务参数:</label>
+      <label for="scriptParams" class="text-[16px] text-gray-600">任务参数:</label>
       <input
         type="text"
         id="scriptParams"
@@ -63,17 +73,40 @@
         <span class="flex items-center space-x-2">
           <input type="radio" name="run-mode" value="exec" checked class="hidden peer">
           <div class="w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-[#98FF98] peer-checked:bg-[#98FF98] transition"></div>
-          <span class="text-gray-800">直接运行</span>
+          <span class="flex items-center space-x-1">
+            <span class="text-gray-800">EXEC 运行</span>
+            <div class="relative group flex items-center">
+              <img src="../assets/alert.png" alt="帮助" 
+                   class="w-5 h-5 cursor-pointer object-contain hover:scale-105 transition-transform">
+              <div class="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-1 w-40 p-2 bg-white text-xs text-gray-700 rounded-md shadow-md border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                执行一个命令并将整个输出（标准输出和标准错误）缓冲到内存中，等待子进程结束后再返回结果。
+                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-l border-t border-gray-300 rotate-45"></div>
+              </div>
+            </div>
+          </span>
         </span>
       </label>
+      
     
       <label class="flex items-center cursor-pointer p-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-200 space-x-2">
         <span class="flex items-center space-x-2">
           <input type="radio" name="run-mode" value="spawn" class="hidden peer">
           <div class="w-4 h-4 rounded-full border-2 border-gray-400 peer-checked:border-[#98FF98] peer-checked:bg-[#98FF98] transition"></div>
-          <span class="text-gray-800">后台运行</span>
+          <span class="flex items-center space-x-1">
+            <span class="text-gray-800">SPAWN 运行</span>
+            <div class="relative group flex items-center">
+              <img src="../assets/alert.png" alt="帮助" 
+                   class="w-5 h-5 cursor-pointer object-contain hover:scale-105 transition-transform">
+              <div class="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-1 w-40 p-2 bg-white text-xs text-gray-700 rounded-md shadow-md border border-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                启动一个子进程并持续流式处理数据，实时接收标准输出和错误输出。
+                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-l border-t border-gray-300 rotate-45"></div>
+              </div>
+            </div>
+          </span>
         </span>
       </label>
+
+      
     </div>
     <br>
 
