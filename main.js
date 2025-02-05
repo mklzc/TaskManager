@@ -55,6 +55,7 @@ function createWindow() {
     });
 
     mainWindow.loadFile('./src/index.html');
+    Menu.setApplicationMenu(null);
     createTray();
 
     mainWindow.on('close', (event) => {
@@ -229,7 +230,7 @@ ipcMain.handle('open-add-script-form', async () => {
         },
     });
     addScriptWindow.loadFile('./src/add-script-form.html');
-
+    Menu.setApplicationMenu(null);
     addScriptWindow.once('ready-to-show', () => {
         addScriptWindow.show();
     });
