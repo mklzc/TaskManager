@@ -77,7 +77,7 @@ function createWindow() {
     });
 
     // 调试用
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -171,13 +171,14 @@ ipcMain.on('run-script', (event, selectedScript) => {
         logStream.write(logDate);
         event.sender.send('update-log', logDate, selectedScript.scriptName);
         scriptProcess.stdout.on('data', (data) => {
-            console.log(`command's stdout ${data}`);
+            console.log(`[STDOUT] ${data}`);
             const logData = `[STDOUT] ${data}`;
             logStream.write(logData);
             event.sender.send('update-log', logData, selectedScript.scriptName);
         });
 
         scriptProcess.stderr.on('data', (data) => {
+            console.log(`[STDERR] ${data}`)
             const logData = `[LOG] ${data}`;
             logStream.write(logData);
             event.sender.send('update-log', logData, selectedScript.scriptName);
@@ -335,7 +336,7 @@ ipcMain.on('delete-script', (event, selectedScript) => {
 // ------删除日志------
 
 ipcMain.on('delete-log', (event, selectedScript) => {
-    const logFilePath = path.join(__dirname, 'logs', `${selectedScript.scriptName}.log`);
+    const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     fs.truncate(logFilePath, 0, (err) => {
         if (err) {
             console.error('清空文件失败:', err);
@@ -358,6 +359,24 @@ ipcMain.on('get-log', (event, scriptName) => {
         }
     } else {
         event.reply('load-log', '[No log available]');
+    }
+});
+
+// ------任务交互功能------
+ipcMain.on('script-interact', (event, script, scriptInput) => {
+    const focusProcess = runningProcesses[script.scriptName];
+    if (focusProcess) {
+        try {
+            console.log(focusProcess);
+            focusProcess.stdin.write(scriptInput);
+            focusProcess.stdin.end();
+
+        } catch(error) {
+            console.log("读取输入失败");
+        }
+    } else {
+        console.log(`${script.scriptName} isn't running`);
+        return;
     }
 });
 

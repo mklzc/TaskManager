@@ -24,7 +24,7 @@
         <div class="menu-item" id="delete-script">删除脚本</div>
         <div class="menu-item" id="delete-log">清除日志</div>
     </div>
-    
+
     <div id="log-menu">
         <div class="menu-item" id="clear-screen">清空屏幕</div>
     </div>
@@ -53,6 +53,18 @@
                 编辑任务
             </button>
         </div>
+    </div>
+
+    <div class="fixed right-4 top-17/20 transform -translate-y-1/2 flex items-center space-x-4 w-4/7">
+        <input type="text" placeholder="输入内容" id="scriptInput" class="flex-grow px-4 py-3 text-[16px] text-gray-800 bg-white border border-gray-300 rounded-full shadow-sm outline-none transition-all duration-300 
+            placeholder-gray-400 placeholder-italic 
+            focus:border-blue-400 focus:shadow-lg focus:shadow-blue-300/50 
+            hover:border-green-400 
+            active:shadow-md active:shadow-blue-300/30
+            box-border" />
+        <button id="submit-button" class="flex flex-row bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:from-purple-600 hover:to-blue-500 hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+            提交
+        </button>
     </div>
 
     <script src="js/index.js"></script>

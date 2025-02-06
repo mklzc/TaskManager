@@ -210,3 +210,14 @@ li.running::after {
     content: "（正在运行）";
     color: #43C463;
 }
+
+.starry-effect {
+    background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%);
+    border: 1px solid #64ffda;
+    box-shadow: 0 0 10px #64ffda, 0 0 20px #64ffda inset;
+}
+
+button {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+}

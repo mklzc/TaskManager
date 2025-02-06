@@ -214,3 +214,15 @@ const clearMenuItem = document.getElementById('clear-screen');
 clearMenuItem.addEventListener('click', () => {
     logOutput.textContent = '';
 });
+
+// ------任务交互功能------
+
+document.getElementById('submit-button').addEventListener('click', () => {
+    const scriptInput = document.getElementById('scriptInput').value;
+    if (scriptInput && selectedScript) {
+        console.log(`正在向 ${selectedScript.scriptName} 输入 ${scriptInput}`);
+        ipcRenderer.send('script-interact', selectedScript, scriptInput);
+    } else {
+        return;
+    }
+});
