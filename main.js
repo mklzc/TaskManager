@@ -76,8 +76,8 @@ function createWindow() {
         mainWindow.webContents.send("scripts-updated");
     });
 
-    // 打开开发者工具（调试用）
-    mainWindow.webContents.openDevTools();
+    // 调试用
+    // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -239,7 +239,7 @@ ipcMain.handle('open-add-script-form', async () => {
         addScriptWindow.show();
     });
 
-    addScriptWindow.webContents.openDevTools();
+    // addScriptWindow.webContents.openDevTools();
     return new Promise((resolve, reject) => {
         addScriptWindow.on('close', () => {
             resolve('窗口已关闭');
@@ -284,7 +284,7 @@ ipcMain.handle('edit-script', async (event, selectedScript) => {
         console.log("send selectedScript to edit", selectedScript);
         editScriptWindow.webContents.send('load-script-data', selectedScript);
     });
-    editScriptWindow.webContents.openDevTools();
+    // editScriptWindow.webContents.openDevTools();
 });
 
 ipcMain.handle('update-script-data', (event, updatedScript) => {

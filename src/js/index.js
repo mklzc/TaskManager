@@ -114,13 +114,15 @@ function selectScript(listItem, script) {
 
 // ------运行任务按钮------
 document.getElementById('run-button').addEventListener('click', () => {
-    console.log('run-button clicked');
-
-    const selectedItem = document.querySelector('#script-list .selected');
-    
-    selectedScript = scripts.find(s => s.scriptName === selectedItem.textContent);
-
-    ipcRenderer.send('run-script', selectedScript);
+    if (selectedScript) {
+        console.log('run-button clicked');
+        const selectedItem = document.querySelector('#script-list .selected');
+        selectedScript = scripts.find(s => s.scriptName === selectedItem.textContent);
+        ipcRenderer.send('run-script', selectedScript);
+    }
+    else {
+        console.log("请先选择一个任务");
+    }
 });
 
 // ------结束任务按钮------
@@ -130,7 +132,7 @@ document.getElementById('stop-button').addEventListener('click', () => {
         ipcRenderer.send('stop-script', selectedScript.scriptName);
     }
     else {
-        console.log("请先选择一个脚本");
+        console.log("请先选择一个任务");
     }
 });
 
