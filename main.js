@@ -7,8 +7,12 @@ let mainWindow;
 let tray = null;
 let runningProcesses = {};
 
-const scriptsJsonPath = path.join(__dirname, 'scripts.json');
-const logsDir = path.join(__dirname, 'logs');
+const userDataPath = app.getPath('userData');
+
+const scriptsJsonPath = path.join(userDataPath, 'scripts.json');
+
+console.log(scriptsJsonPath);
+const logsDir = path.join(userDataPath, 'logs');
 
 if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
