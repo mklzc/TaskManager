@@ -2,6 +2,7 @@ const { ipcRenderer } = require('electron');
 
 let scripts = [];
 const contextMenu = document.getElementById('context-menu');
+const logMenu = document.getElementById('log-menu');
 const logOutput = document.getElementById('log-output');
 let selectedScript = null;
 
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.addEventListener('click', () => {
         contextMenu.style.display = 'none';
+        logMenu.style.display = 'none';
     });
 
     const runScriptMenuItem = document.getElementById('run-script');
@@ -194,4 +196,19 @@ ipcRenderer.on('status-update', (event, { scriptName, status }) => {
             scriptItem.classList.add('selected-line');
         }
     }
+});
+
+// ------清空屏幕右键菜单------
+
+document.getElementById('log-container').addEventListener('contextmenu', (event) => {
+    event.preventDefault();
+    logMenu.style.top = `${event.clientY}px`;
+    logMenu.style.left = `${event.clientX}px`;
+    logMenu.style.display = 'block';
+    console.log("logMenu 右键菜单打开");
+});
+
+const clearMenuItem = document.getElementById('clear-screen');
+clearMenuItem.addEventListener('click', () => {
+    logOutput.textContent = '';
 });
