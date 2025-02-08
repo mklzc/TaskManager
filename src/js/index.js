@@ -1,10 +1,12 @@
 const { ipcRenderer } = require('electron');
 
 let scripts = [];
+let runningScripts = []
+let selectedScript = null;
+
 const contextMenu = document.getElementById('context-menu');
 const containerMenu = document.getElementById('container-menu');
 const logOutput = document.getElementById('log-output');
-let selectedScript = null;
 
 // ------刷新任务列表------
 async function refreshScripts() {
@@ -20,10 +22,16 @@ function renderScripts() {
     console.log('Renderer: Received scripts:', scripts);
 
     scriptList.innerHTML = '';
+
     scripts.forEach((script) => {
         const listItem = document.createElement('li');
         listItem.textContent = script.scriptName;
         listItem.className = 'script-item';
+
+        if (runningScripts.includes(script.scriptName)) {
+            listItem.classList.add('running');
+            listItem.classList.remove('selected-line');
+        }
 
         listItem.addEventListener('click', () => {
             selectScript(listItem, script);
@@ -33,7 +41,8 @@ function renderScripts() {
         // 绑定右键菜单事件
         listItem.addEventListener('contextmenu', (event) => {
             event.preventDefault();
-            selectedScript = script;
+            selectScript(listItem, script);
+            containerMenu.style.display = 'none';
 
             contextMenu.style.top = `${event.clientY}px`;
             contextMenu.style.left = `${event.clientX}px`;
@@ -71,6 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     runScriptMenuItem.addEventListener('click', () => {
         if (selectedScript) {
             ipcRenderer.send('run-script', selectedScript);
+            runningScripts.push(selectedScript.scriptName);
         }
     });
 
@@ -132,6 +142,7 @@ document.getElementById('run-button').addEventListener('click', () => {
         console.log('run-button clicked');
         const selectedItem = document.querySelector('#script-list .selected');
         selectedScript = scripts.find(s => s.scriptName === selectedItem.textContent);
+        runningScripts.push(selectedScript.scriptName);
         ipcRenderer.send('run-script', selectedScript);
     }
     else {
@@ -144,6 +155,7 @@ document.getElementById('stop-button').addEventListener('click', () => {
     if (selectedScript) {
         console.log(`stopping ${selectedScript.scriptName}`);
         ipcRenderer.send('stop-script', selectedScript.scriptName);
+        runningScripts.filter(s => s !== selectedScript.scriptName);
     }
     else {
         console.log("请先选择一个任务");
