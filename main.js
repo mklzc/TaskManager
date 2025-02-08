@@ -163,7 +163,6 @@ ipcMain.on('run-script', (event, selectedScript) => {
         });
     }
     else {
-
         const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true, cwd: directoryPath});
         console.log(`${selectedScript.scriptName} spawn here ${command} ${selectedScript.scriptParams}`);
         runningProcesses[selectedScript.scriptName] = scriptProcess;

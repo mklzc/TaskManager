@@ -154,7 +154,7 @@
     background-color: #f0f0f0;
 }
 
-#log-menu {
+#container-menu {
     display: none;
     position: absolute;
     background: white;
@@ -166,12 +166,12 @@
     min-width: 150px;
 }
 
-#log-menu .menu-item {
+#container-menu .menu-item {
     padding: 8px 16px;
     cursor: pointer;
 }
 
-#log-menu .menu-item:hover {
+#container-menu .menu-item:hover {
     background-color: #f0f0f0;
 }
 

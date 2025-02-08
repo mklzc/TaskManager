@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 
 let scripts = [];
 const contextMenu = document.getElementById('context-menu');
-const logMenu = document.getElementById('log-menu');
+const containerMenu = document.getElementById('container-menu');
 const logOutput = document.getElementById('log-output');
 let selectedScript = null;
 
@@ -56,21 +56,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Scripts updates recieved');
         await refreshScripts();
     });
-    
+
     document.addEventListener('click', () => {
         contextMenu.style.display = 'none';
-        logMenu.style.display = 'none';
+        containerMenu.style.display = 'none';
     });
 
     const runScriptMenuItem = document.getElementById('run-script');
     const deleteScriptMenuItem = document.getElementById('delete-script');
     const deletelogScriptMenuItem = document.getElementById('delete-log');
+    const addScriptMenuItem = document.getElementById('add-script');
+    const clearMenuItem = document.getElementById('clear-screen');
 
     runScriptMenuItem.addEventListener('click', () => {
         if (selectedScript) {
             ipcRenderer.send('run-script', selectedScript);
         }
-        contextMenu.style.display = 'none';
     });
 
     deleteScriptMenuItem.addEventListener('click', () => {
@@ -87,6 +88,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             ipcRenderer.send('delete-log', selectedScript);
             logOutput.textContent = '';
         }
+    });
+
+    addScriptMenuItem.addEventListener('click', () => {
+        try {
+            ipcRenderer.invoke('open-add-script-form', selectedScript);
+            refreshScripts();
+        } catch (error) {
+            console.log("添加脚本失败");
+        }
+    });
+
+    clearMenuItem.addEventListener('click', () => {
+        logOutput.textContent = '';
     });
 });
 
@@ -107,7 +121,7 @@ function selectScript(listItem, script) {
     if (!listItem.classList.contains('running')) {
         listItem.classList.add('selected-line');
     }
-    
+
     selectedScript = script;
     console.log('选中脚本:', script.scriptName);
 }
@@ -139,15 +153,10 @@ document.getElementById('stop-button').addEventListener('click', () => {
 // ------添加任务按钮------
 document.getElementById('add-script-button').addEventListener('click', async () => {
     try {
-        const result = await ipcRenderer.invoke('open-add-script-form');
-        if (result) {
-            console.log('脚本信息:', result);
-            refreshScripts();
-        } else {
-            console.log('用户取消了操作。');
-        }
+        ipcRenderer.invoke('open-add-script-form');
+        refreshScripts();
     } catch (err) {
-        console.error('打开对话框失败:', err);
+        console.error('添加脚本失败:', err);
     }
 });
 
@@ -180,7 +189,6 @@ ipcRenderer.on('load-log', (event, logContent) => {
 
 // ------运行状态更新------
 ipcRenderer.on('status-update', (event, { scriptName, status }) => {
-
     console.log(`changing status ${scriptName} to ${status}`);
     let scriptItem = null;
     document.querySelectorAll(".script-item").forEach(item => {
@@ -200,19 +208,15 @@ ipcRenderer.on('status-update', (event, { scriptName, status }) => {
     }
 });
 
-// ------清空屏幕右键菜单------
-
-document.getElementById('log-container').addEventListener('contextmenu', (event) => {
+// ------Container右键菜单------
+document.getElementById('container').addEventListener('contextmenu', (event) => {
     event.preventDefault();
-    logMenu.style.top = `${event.clientY}px`;
-    logMenu.style.left = `${event.clientX}px`;
-    logMenu.style.display = 'block';
-    console.log("logMenu 右键菜单打开");
-});
-
-const clearMenuItem = document.getElementById('clear-screen');
-clearMenuItem.addEventListener('click', () => {
-    logOutput.textContent = '';
+    if (contextMenu.style.display !== 'block') {
+        containerMenu.style.top = `${event.clientY}px`;
+        containerMenu.style.left = `${event.clientX}px`;
+        containerMenu.style.display = 'block';
+        console.log("Container 右键菜单打开");
+    }
 });
 
 // ------任务交互功能------
