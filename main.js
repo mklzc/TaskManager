@@ -77,7 +77,7 @@ function createWindow() {
     });
 
     // 调试用
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
