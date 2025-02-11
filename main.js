@@ -76,7 +76,7 @@ function createWindow() {
         mainWindow.webContents.send("scripts-updated");
     });
 
-    // 调试用
+    // debug
     // mainWindow.webContents.openDevTools();
 }
 
@@ -115,10 +115,21 @@ ipcMain.on('run-script', (event, selectedScript) => {
     }
 
     let command;
-    ext = path.extname(selectedScript.scriptPath);
+    const directoryPath = path.dirname(selectedScript.scriptPath);
+    const ext = path.extname(selectedScript.scriptPath);
+
     switch (ext) {
         case '.py':
-            command = `python -u ${selectedScript.scriptPath}`;
+            const venvPath = path.join(directoryPath, '.venv');
+            if (fs.existsSync(venvPath)) {
+                const pythonExecutable = process.platform === "win32"
+                    ? path.join(venvPath, "Scripts", "python.exe")
+                    : path.join(venvPath, "bin", "python");
+                command = `${pythonExecutable} -u ${selectedScript.scriptPath}`
+            }
+            else {
+                command = `python -u ${selectedScript.scriptPath}`;
+            }
             break;
         case '.sh':
             command = `bash ${selectedScript.scriptPath}`;
@@ -135,7 +146,6 @@ ipcMain.on('run-script', (event, selectedScript) => {
     console.log(`Running script: ${command} ${selectedScript.scriptParams}`);
     const logFilePath = path.join(logsDir, `${selectedScript.scriptName}.log`);
     const logStream = fs.createWriteStream(logFilePath, { flags: 'a' });
-    const directoryPath = path.dirname(selectedScript.scriptPath);
     event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'running' });
 
     if (selectedScript.runMode === "exec") {
@@ -163,7 +173,7 @@ ipcMain.on('run-script', (event, selectedScript) => {
         });
     }
     else {
-        const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true, cwd: directoryPath});
+        const scriptProcess = spawn(command, [selectedScript.scriptParams], { shell: true, cwd: directoryPath });
         console.log(`${selectedScript.scriptName} spawn here ${command} ${selectedScript.scriptParams}`);
         runningProcesses[selectedScript.scriptName] = scriptProcess;
         const logDate = `\n[${new Date().toLocaleString()}] 执行: ${selectedScript.scriptName}\n`;
@@ -186,10 +196,10 @@ ipcMain.on('run-script', (event, selectedScript) => {
         scriptProcess.on('close', (code) => {
             delete runningProcesses[selectedScript.scriptName];
             const logData = `\n[Process Exited] Exit code: ${code}\n`;
-            
+
             logStream.write(logData);
             logStream.end();
-        
+
             event.sender.send('status-update', { scriptName: selectedScript.scriptName, status: 'stopped' });
             event.sender.send('update-log', logData, selectedScript.scriptName);
         });
@@ -290,7 +300,7 @@ ipcMain.handle('edit-script', async (event, selectedScript) => {
 ipcMain.handle('update-script-data', (event, updatedScript) => {
     console.log("recieve updatedScript", updatedScript);
     let scripts = [];
-    
+
     const fileContent = fs.readFileSync(scriptsJsonPath, 'utf-8');
     if (fileContent.trim() === '') {
         scripts = [];
@@ -370,7 +380,7 @@ ipcMain.on('script-interact', (event, script, scriptInput) => {
             focusProcess.stdin.write(scriptInput);
             focusProcess.stdin.end();
 
-        } catch(error) {
+        } catch (error) {
             console.log("读取输入失败");
         }
     } else {
