@@ -232,7 +232,6 @@ document.getElementById('container').addEventListener('contextmenu', (event) => 
 });
 
 // ------任务交互功能------
-
 document.getElementById('submit-button').addEventListener('click', () => {
     const scriptInput = document.getElementById('scriptInput').value;
     if (scriptInput && selectedScript) {
@@ -241,4 +240,9 @@ document.getElementById('submit-button').addEventListener('click', () => {
     } else {
         return;
     }
+});
+
+// ------处理页面导航------
+ipcRenderer.on('navigate', (event, page) => {
+    ipcRenderer.send('navigate', page);
 });

@@ -59,7 +59,35 @@ function createWindow() {
     });
 
     mainWindow.loadFile('./src/index.html');
-    Menu.setApplicationMenu(null);
+    const menu = Menu.buildFromTemplate([
+        {
+            label: '应用',
+            submenu: [
+                { label: '设置', click: () => mainWindow.webContents.send('navigate', 'settings.html') },
+                { type: 'separator' },
+                { label: '退出', role: 'quit' }
+            ]
+        },
+        {
+            label: '编辑',
+            submenu: [
+                { label: '撤销', role: 'undo' },
+                { label: '重做', role: 'redo' },
+                { type: 'separator' },
+                { label: '剪切', role: 'cut' },
+                { label: '复制', role: 'copy' },
+                { label: '粘贴', role: 'paste' },
+            ]
+        },
+        {
+            label: '帮助',
+            submenu: [
+                // { label: '关于', click: () => mainWindow.webContents.send('navigate', 'about.html') },
+                { label: '开发者工具', role: 'toggleDevTools' }
+            ]
+        }
+    ]);
+    Menu.setApplicationMenu(menu);
     createTray();
 
     mainWindow.on('close', (event) => {
@@ -77,7 +105,7 @@ function createWindow() {
     });
 
     // debug
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -86,6 +114,13 @@ app.whenReady().then(() => {
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
+});
+
+// ------处理页面导航------
+ipcMain.on('navigate', (event, page) => {
+    if (mainWindow) {
+        mainWindow.loadFile(path.join(__dirname, `src/${page}`));
+    }
 });
 
 // ------加载任务内容------
