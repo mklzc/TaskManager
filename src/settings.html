@@ -4,10 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>设置</title>
+    <link rel="stylesheet" href="../dist/styles.css">
     <script defer src="js/settings.js"></script>
 </head>
-<body>
-    <h1>设置</h1>
-    <button id="back-to-main">返回</button>
+<body class="bg-gray-100 text-gray-900 flex items-center justify-center h-screen">
+
+    <div class="bg-white shadow-lg rounded-2xl p-8 w-96">
+        <h2 class="text-2xl font-semibold text-center mb-6">设置</h2>
+
+        <!-- 开机自启设置 -->
+        <div class="flex items-center justify-between mb-6">
+            <span class="text-lg font-medium">开机自启</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="autoLaunchCheckbox" class="sr-only peer">
+                <div class="w-12 h-7 bg-gray-300 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+        </div>
+
+        <!-- 返回按钮 -->
+        <button id="back-to-main"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-all duration-200 shadow-md">
+            返回
+        </button>
+    </div>
+
 </body>
 </html>

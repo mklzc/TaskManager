@@ -105,7 +105,7 @@ function createWindow() {
     });
 
     // debug
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -422,6 +422,20 @@ ipcMain.on('script-interact', (event, script, scriptInput) => {
         console.log(`${script.scriptName} isn't running`);
         return;
     }
+});
+
+// ------设置开机自启------
+ipcMain.on('setAutoLaunch', (event, enable) => {
+    app.setLoginItemSettings({
+        openAtLogin: enable,
+        path: app.getPath('exe')
+    });
+});
+
+// ------获取当前开机自启状态------
+ipcMain.on('getAutoLaunch', (event) => {
+    const isEnabled = app.getLoginItemSettings().openAtLogin;
+    event.sender.send('autoLaunchStatus', isEnabled); // 发送状态回渲染进程
 });
 
 app.on('window-all-closed', () => {
